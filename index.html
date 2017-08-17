@@ -12,20 +12,22 @@
       }
 
       h2 {
-        text-align: center;
+      	margin-left: 300px;
         color: black;
       }
 
-      div.years_buttons {
+      div.month_buttons {
         position: fixed;
-        top: 5px;
+        top: 100px;
         left: 50px;
+
       }
 
-      div.years_buttons div {
+      div.month_buttons div {
         background-color: rgb(251, 201, 127);
         padding: 3px;
         margin: 7px;
+        cursor: pointer;
       }
     </style>
     <script type="text/javascript">  
@@ -46,13 +48,7 @@
             .append('g')
             .attr('class', 'map');
 
-        // var years = [];
-
-        //   for(var i = 1930; i < 2015; i += 4) {
-        //     if(i !== 1942 && i !== 1946) {
-        //       years.push(i);
-        //     };
-        //   }
+      
 
         var projection = d3.geo.albersUsa()
                                .scale(1150)
@@ -112,7 +108,7 @@
               lines.enter()
                      .append("line")
                      .style('stroke', 'black')
-                     .style('stroke-opacity', 0.05)
+                     .style('stroke-opacity', 0.04)
                      .transition()
                      .duration(500)
         			 .attr('x1', function(d){ return d['origin_point'][0]})
@@ -124,6 +120,9 @@
              }
 
              var month = 1;
+             var months = [];
+             for(var i=1; i <= 12; i++)
+             	months.push(i);
 
 	         var month_interval = setInterval(function() {
 	            update(month);
@@ -132,6 +131,35 @@
 
 	            if(month > 12) {
 	                clearInterval(month_interval);
+
+	                var buttons = d3.select("body")
+                        .append("div")
+                        .attr("class", "month_buttons")
+                        .selectAll("div")
+                        .data(months)
+                        .enter()
+                        .append("div")
+                        .text(function(d) {
+                            return d;
+                        });
+
+                    buttons.on("click", function(d) {
+                    d3.select(".month_buttons")
+                      .selectAll("div")
+                      .transition()
+                      .duration(500)
+                      .style("color", "black")
+                      .style("background", "rgb(251, 201, 127)");
+
+                    d3.select(this)
+                      .transition()
+                      .duration(500)
+                      .style("background", "lightBlue")
+                      .style("color", "white");
+                    update(d);
+                });
+
+
 
 	             }
 	            }
