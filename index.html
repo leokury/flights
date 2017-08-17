@@ -70,13 +70,75 @@
                      .style('stroke-width', 0.5);
 
         function plot_points(data) {
-        	svg.selectAll('circle')
-        		.data(data)
-        		.enter()
-        		.append('circle')
-        		
 
+        	//calculate projection to origins and dests
+        	data.forEach(function(d){
+        		d['origin_point'] = projection([ d['origin_long'], d['origin_lat'] ]);
+        		d['dest_point'] = projection([ d['dest_long'], d['dest_lat'] ]);
+        	});
+
+
+        	//remove unknow positions
+        	data = data.filter(function(d){
+        		if(!d['origin_point'] || !d['dest_point'])
+        			return false;
+        		return true;
+        	});
+
+        	// svg.selectAll('line')
+        	// 	.data(data)
+        	// 	.enter()
+        	// 	.append('line')
+        	// 	.style('stroke', 'black')
+        	// 	.style('stroke-opacity', 0.1)
+        	// 	.attr('x1', function(d){ return d['origin_point'][0]})
+        	// 	.attr('y1', function(d){ return d['origin_point'][1]})
+        	// 	.attr('x2', function(d){ return d['dest_point'][0]})
+        	// 	.attr('y2', function(d){ return d['dest_point'][1]});
+
+        	function update(month) {
+              var filtered = data.filter(function(d) {
+                  return +d.Month === month;
+              });
+
+              d3.select("h2")
+                .text("Flights cancelled due to weather in Month " + month);
+
+              var lines = svg.selectAll('line')
+                               .data(filtered);
+
+              lines.exit().remove();
+
+              lines.enter()
+                     .append("line")
+                     .style('stroke', 'black')
+                     .style('stroke-opacity', 0.05)
+                     .transition()
+                     .duration(500)
+        			 .attr('x1', function(d){ return d['origin_point'][0]})
+        			 .attr('y1', function(d){ return d['origin_point'][1]})
+        			 .attr('x2', function(d){ return d['dest_point'][0]})
+        			 .attr('y2', function(d){ return d['dest_point'][1]});
+
+
+             }
+
+             var month = 1;
+
+	         var month_interval = setInterval(function() {
+	            update(month);
+
+	            month++;
+
+	            if(month > 12) {
+	                clearInterval(month_interval);
+
+	             }
+	            }
+	          , 1000);
+        	
         }
+        
 
         /*function plot_points(data) {
             
